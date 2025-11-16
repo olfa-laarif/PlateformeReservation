@@ -35,6 +35,18 @@ package org.example.model;
         public void setEmail(String email) { this.email = email; }
         public void setMotDePasse(String motDePasse) { this.motDePasse = motDePasse; }
         public void setTypeCompte(String typeCompte) { this.typeCompte = typeCompte; }
+
+        @Override
+        public String toString() {
+            return "Utilisateur{" +
+                    "idUser=" + idUser +
+                    ", pseudo='" + pseudo + '\'' +
+                    ", prenom='" + prenom + '\'' +
+                    ", nom='" + nom + '\'' +
+                    ", email='" + email + '\'' +
+                    ", typeCompte='" + typeCompte + '\'' +
+                    '}';
+        }
     }
 
 
