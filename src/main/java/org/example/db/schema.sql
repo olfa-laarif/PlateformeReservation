@@ -13,18 +13,20 @@ CREATE TABLE `user` (
 
 
 CREATE TABLE `event` (
-    event_id           INT AUTO_INCREMENT PRIMARY KEY,
-    name               VARCHAR(150)        NOT NULL,
-    event_type         ENUM('Concert', 'Spectacle', 'Conference') NOT NULL,
-    event_date         DATETIME            NOT NULL,
-    location           VARCHAR(150)        NOT NULL,
-    organizer_id       INT                 NOT NULL,
+    event_id       INT AUTO_INCREMENT PRIMARY KEY,
+    name           VARCHAR(150) NOT NULL,
+    event_type     ENUM('Concert', 'Spectacle', 'Conference') NOT NULL,
+    special_guest  VARCHAR(150),  -- artiste, troupe ou intervenant selon le type
+    event_date     DATETIME NOT NULL,
+    location       VARCHAR(150) NOT NULL,
+    organizer_id   INT NOT NULL,
 
     FOREIGN KEY (organizer_id)
-        REFERENCES user(user_id)
+        REFERENCES `user`(user_id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
 );
+
 
 
 CREATE TABLE category (
