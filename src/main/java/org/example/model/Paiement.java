@@ -30,3 +30,27 @@ public class Paiement implements Payable {
     }
 }
 
+    public static void verifierDonneesDePaiement(String nom, String numeroCarte, double montant, int idReservation) throws PaiementInvalideException {
+
+        // vérification du nom du titulaire de la CB
+        if (nom.isEmpty()) {
+            throw new PaiementInvalideException("Le nom du titulaire est requis.");
+        }
+
+        // vérification du numéro de la CB
+        if (!numeroCarte.matches("\\d{16}")) {
+            throw new PaiementInvalideException("Le numéro de carte doit contenir 16 chiffres.");
+        }
+
+        // vérification du montant saisit pour la réservation
+        double montantTotalReservation;
+        /*
+        * Récuperation de la réservation de la BD par idReservation
+        * + calcul du montant total
+        * + comparaison avec le montant à payer
+        * */
+        if (montant < 0 || montant !== montantTotalReservation){
+            throw new PaiementInvalideException("Le montant à payer pour la réservation numéro "
+                    + idReservation + " est erroné.");
+        }
+    }
