@@ -10,7 +10,7 @@ CREATE TABLE `user` (
 
 CREATE TABLE category (
     category_id     INT AUTO_INCREMENT PRIMARY KEY,
-    category_name   VARCHAR(50) NOT NULL
+    category_name   VARCHAR(50) NOT NULL UNIQUE
 );
 
 CREATE TABLE `event` (
@@ -34,6 +34,8 @@ CREATE TABLE place (
     price         DECIMAL(10,2) NOT NULL,
     category_id   INT NOT NULL,
     event_id      INT NOT NULL,
+    seats_total   INT NOT NULL,
+
 
     FOREIGN KEY (category_id)
         REFERENCES category(category_id)
@@ -43,7 +45,9 @@ CREATE TABLE place (
     FOREIGN KEY (event_id)
         REFERENCES event(event_id)
         ON UPDATE CASCADE
-        ON DELETE CASCADE
+        ON DELETE CASCADE,
+
+    UNIQUE(event_id,category_id)
 );
 
 CREATE TABLE reservation (
