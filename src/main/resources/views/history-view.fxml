@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox xmlns:fx="http://javafx.com/fxml" spacing="8" alignment="TOP_LEFT" fx:controller="org.example.controller.HistoryController" styleClass="root-pane">
+    <padding>
+        <Insets top="12" right="12" bottom="12" left="12" />
+    </padding>
+
+    <VBox spacing="10" styleClass="card">
+        <HBox spacing="8">
+            <Label text="Historique des réservations" style="-fx-font-size:14px; -fx-font-weight:bold;" styleClass="title"/>
+            <Region HBox.hgrow="ALWAYS" />
+            <Button fx:id="backButton" text="Retour" styleClass="secondary" />
+        </HBox>
+
+        <TableView fx:id="table" prefWidth="600">
+        <columns>
+            <TableColumn fx:id="colDate" text="Date" prefWidth="140" />
+            <TableColumn fx:id="colEvent" text="Événement" prefWidth="180" />
+            <TableColumn fx:id="colEventDate" text="Date événement" prefWidth="120" />
+            <TableColumn fx:id="colQty" text="Quantité" prefWidth="60" />
+            <TableColumn fx:id="colTotal" text="Total" prefWidth="80" />
+            <TableColumn fx:id="colAction" text="Action" prefWidth="80" />
+        </columns>
+        </TableView>
+
+        <Label fx:id="statusLabel" text="" styleClass="status" />
+    </VBox>
+
+</VBox>
