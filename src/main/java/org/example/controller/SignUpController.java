@@ -79,6 +79,11 @@ public class SignUpController {
                 throw new Exception("Tous les champs doivent être remplis.");
             }
 
+            // Validation du format email
+            if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+                throw new Exception("Format de l'email invalide.");
+            }
+
             Utilisateur user;
             if ("Client".equalsIgnoreCase(typeCompte)) {
                 user = new Client(0, pseudo, prenom, nom, email, mdp);
