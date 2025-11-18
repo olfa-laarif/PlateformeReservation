@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<?import javafx.collections.FXCollections?>
+<?import java.lang.String?>
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.example.controller.SignUpController"
+            prefHeight="400.0" prefWidth="600.0">
+
+    <children>
+        <VBox layoutX="100.0" layoutY="50.0" spacing="10" prefWidth="400">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+
+            <Label text="Créer un compte" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+
+            <TextField fx:id="pseudoField" promptText="Pseudo"/>
+            <TextField fx:id="prenomField" promptText="Prénom"/>
+            <TextField fx:id="nomField" promptText="Nom"/>
+            <TextField fx:id="emailField" promptText="Email"/>
+            <PasswordField fx:id="passwordField" promptText="Mot de passe"/>
+
+            <ComboBox fx:id="typeCompteComboBox" promptText="Type de compte">
+                <items>
+                    <FXCollections fx:factory="observableArrayList">
+                        <String fx:value="Client"/>
+                        <String fx:value="Organisateur"/>
+                    </FXCollections>
+                </items>
+            </ComboBox>
+
+            <HBox spacing="10">
+                <Button fx:id="signupButton" text="Créer le compte"/>
+                <Button fx:id="cancelButton" text="Annuler"/>
+            </HBox>
+
+        </VBox>
+    </children>
+</AnchorPane>
