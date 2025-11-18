@@ -48,13 +48,14 @@ public class ReservationDAO {
      */
     public List<ReservationSummary> listByClient(Connection conn, int clientId) throws SQLException {
         String sql = "SELECT r.reservation_id, r.reservation_date, e.name AS event_name, e.event_date, COUNT(rhp.place_id) AS quantity, SUM(p.price) AS total " +
-                "FROM reservation r " +
-                "JOIN reservation_has_place rhp ON r.reservation_id = rhp.reservation_id " +
-                "JOIN place p ON rhp.place_id = p.place_id " +
-                "JOIN event e ON p.event_id = e.event_id " +
-                "WHERE r.client_id = ? " +
-                "GROUP BY r.reservation_id, r.reservation_date, e.name, e.event_date " +
-                "ORDER BY r.reservation_date DESC";
+            "FROM reservation r " +
+            "JOIN reservation_has_place rhp ON r.reservation_id = rhp.reservation_id " +
+            "JOIN place p ON rhp.place_id = p.place_id " +
+            "JOIN event e ON p.event_id = e.event_id " +
+            "JOIN payment pay ON pay.reservation_id = r.reservation_id " +
+            "WHERE r.client_id = ? " +
+            "GROUP BY r.reservation_id, r.reservation_date, e.name, e.event_date " +
+            "ORDER BY r.reservation_date DESC";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, clientId);
