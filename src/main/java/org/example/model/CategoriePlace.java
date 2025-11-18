@@ -18,6 +18,13 @@ public class CategoriePlace implements Reservable {
         this.placesRestantes = total;
     }
 
+    public int getIdCategorie() {
+        return idCategorie;
+    }
+
+    public String getNomCategorie() {
+        return nomCategorie;
+    }
 
     public double getPrix() {
         return prix;
