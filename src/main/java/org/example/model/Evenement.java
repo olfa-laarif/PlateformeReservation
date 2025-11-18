@@ -1,54 +1,67 @@
 package org.example.model;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Evenement {
-    protected int idEvent;
+
+    protected int idEvenement;
     protected String nom;
-    protected LocalDate dateEvent;
+    protected LocalDateTime dateEvenement;
     protected String lieu;
+    protected Organisateur organisateur;
 
-    protected List<CategoriePlace> categories = new ArrayList<>();
+    // Liste des places disponibles pour cet événement
+    protected List<Place> places = new ArrayList<>();
 
-    public Evenement(int id, String nom, LocalDate date, String lieu) {
-        this.idEvent = id;
+    public Evenement(int idEvenement, String nom, LocalDateTime dateEvenement, String lieu, Organisateur organisateur) {
+        this.idEvenement = idEvenement;
         this.nom = nom;
-        this.dateEvent = date;
+        this.dateEvenement = dateEvenement;
         this.lieu = lieu;
+        this.organisateur = organisateur;
     }
 
+    // Chaque sous-classe définit l'artiste ou l'intervenant
     public abstract String getSpecialGuest();
 
-    public void ajouterCategorie(CategoriePlace categorie) {
-        categories.add(categorie);
+    // Ajouter une place à l'événement
+    public void ajouterPlace(Place place) {
+        places.add(place);
     }
 
-    public List<CategoriePlace> getCategories() {
-        return categories;
+    // Retourne la liste des places
+    public List<Place> getPlaces() {
+        return places;
     }
 
+    // Calcul du chiffre d'affaires total
     public double getTotalVentes() {
-    //TODO
-        return 0;
+        double total = 0;
+        for (Place p : places) {
+            if (!p.estDisponible()) { // si la place est réservée
+                total += p.getPrix();
+            }
+        }
+        return total;
     }
 
+    // Calcul du taux de remplissage
     public double getTauxRemplissage() {
-        //TODO
-        return 0;
+        if (places.isEmpty()) return 0;
+        long placesReservees = places.stream().filter(p -> !p.estDisponible()).count();
+        return (placesReservees * 100.0) / places.size();
     }
 
     // Getters et setters
-    public int getIdEvent() { return idEvent; }
+    public int getIdEvenement() { return idEvenement; }
     public String getNom() { return nom; }
-    public LocalDate getDateEvent() { return dateEvent; }
-    public String getLieu() { return lieu; }
-
     public void setNom(String nom) { this.nom = nom; }
-    public void setDateEvent(LocalDate dateEvent) { this.dateEvent = dateEvent; }
+    public LocalDateTime getDateEvent() { return dateEvenement; }
+    public void setDateEvent(LocalDateTime dateEvent) { this.dateEvenement = dateEvent; }
+    public String getLieu() { return lieu; }
     public void setLieu(String lieu) { this.lieu = lieu; }
-
-
+    public Organisateur getOrganisateur() { return organisateur; }
+    public void setOrganisateur(Organisateur organisateur) { this.organisateur = organisateur; }
 }
-
