@@ -9,36 +9,39 @@
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="org.example.controller.SignUpController"
-            prefHeight="400.0" prefWidth="600.0">
+            prefHeight="500.0" prefWidth="700.0"
+            stylesheets="@style.css"
+>
 
-    <children>
-        <VBox layoutX="100.0" layoutY="50.0" spacing="10" prefWidth="400">
-            <padding>
-                <Insets top="20" right="20" bottom="20" left="20"/>
-            </padding>
+    <VBox layoutX="100.0" layoutY="50.0" spacing="10" prefWidth="400">
+        <padding>
+            <Insets top="20" right="20" bottom="20" left="20"/>
+        </padding>
 
-            <Label text="Créer un compte" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+        <Label text="Créer un compte" styleClass="title-label"/>
 
-            <TextField fx:id="pseudoField" promptText="Pseudo"/>
-            <TextField fx:id="prenomField" promptText="Prénom"/>
-            <TextField fx:id="nomField" promptText="Nom"/>
-            <TextField fx:id="emailField" promptText="Email"/>
-            <PasswordField fx:id="passwordField" promptText="Mot de passe"/>
+        <TextField fx:id="pseudoField" promptText="Pseudo" styleClass="text-field"/>
+        <TextField fx:id="prenomField" promptText="Prénom" styleClass="text-field"/>
+        <TextField fx:id="nomField" promptText="Nom" styleClass="text-field"/>
+        <TextField fx:id="emailField" promptText="Email" styleClass="text-field"/>
+        <PasswordField fx:id="passwordField" promptText="Mot de passe" styleClass="password-field"/>
 
-            <ComboBox fx:id="typeCompteComboBox" promptText="Type de compte">
-                <items>
-                    <FXCollections fx:factory="observableArrayList">
-                        <String fx:value="Client"/>
-                        <String fx:value="Organisateur"/>
-                    </FXCollections>
-                </items>
-            </ComboBox>
+        <ComboBox fx:id="typeCompteComboBox" promptText="Type de compte" styleClass="combo-box">
+            <items>
+                <FXCollections fx:factory="observableArrayList">
+                    <String fx:value="Client"/>
+                    <String fx:value="Organisateur"/>
+                </FXCollections>
+            </items>
+        </ComboBox>
 
-            <HBox spacing="10">
-                <Button fx:id="signupButton" text="Créer le compte"/>
-                <Button fx:id="cancelButton" text="Annuler"/>
-            </HBox>
+        <HBox spacing="10">
+            <VBox.margin>
+                <Insets top="15"/>
+            </VBox.margin>
+            <Button fx:id="signupButton" text="Créer le compte" styleClass="button"/>
+            <Button fx:id="cancelButton" text="Annuler" styleClass="button cancel"/>
+        </HBox>
 
-        </VBox>
-    </children>
+    </VBox>
 </AnchorPane>

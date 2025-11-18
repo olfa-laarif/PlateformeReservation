@@ -14,7 +14,7 @@ public class MainApplication extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("/views/login-view.fxml"));
         Parent root = fxmlLoader.load();
         Scene scene = new Scene(root, 600, 400);
-        stage.setTitle("Gestion Utilisateurs");
+        stage.setTitle("Plateforme Reservations Tickets");
         stage.setScene(scene);
         stage.show();
     }
