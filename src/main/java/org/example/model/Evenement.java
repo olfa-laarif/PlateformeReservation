@@ -36,6 +36,13 @@ public abstract class Evenement {
         return places;
     }
 
+    public void setPlaces(List<Place> places) {
+        this.places.clear();
+        if (places != null) {
+            this.places.addAll(places);
+        }
+    }
+
     // Calcul du chiffre d'affaires total
     public double getTotalVentes() {
         double total = 0;
@@ -64,4 +71,24 @@ public abstract class Evenement {
     public void setLieu(String lieu) { this.lieu = lieu; }
     public Organisateur getOrganisateur() { return organisateur; }
     public void setOrganisateur(Organisateur organisateur) { this.organisateur = organisateur; }
+
+    public void setIdEvenement(int idEvenement) {
+        this.idEvenement = idEvenement;
+    }
+
+    public String getTypeEvenement() {
+        return getClass().getSimpleName();
+    }
+
+    public long getNombrePlacesReservees() {
+        return places.stream().filter(p -> !p.estDisponible()).count();
+    }
+
+    public long getNombrePlacesDisponibles() {
+        return places.stream().filter(Place::estDisponible).count();
+    }
+
+    public int getCapaciteTotale() {
+        return places.size();
+    }
 }
