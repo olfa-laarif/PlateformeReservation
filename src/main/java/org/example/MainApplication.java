@@ -14,7 +14,9 @@ public class MainApplication extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("/views/login-view.fxml"));
         Parent root = fxmlLoader.load();
         Scene scene = new Scene(root, 600, 400);
-        stage.setTitle("Plateforme Reservations Tickets");
+        String css = MainApplication.class.getResource("/styles/app.css").toExternalForm();
+        scene.getStylesheets().add(css);
+        stage.setTitle("Gestion Utilisateurs");
         stage.setScene(scene);
         stage.show();
     }

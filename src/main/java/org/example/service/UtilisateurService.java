@@ -19,6 +19,7 @@ public class UtilisateurService {
 
         Utilisateur user = utilisateurDAO.login(pseudo, mdp);
 
+
         if (user == null) {
             throw new Exception("Identifiants incorrects.");
         }

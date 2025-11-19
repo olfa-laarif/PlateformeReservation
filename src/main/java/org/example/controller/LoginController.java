@@ -7,11 +7,13 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import org.example.dao.UtilisateurDAO;
+import org.example.MainApplication;
 import org.example.model.Client;
 import org.example.model.Organisateur;
 import org.example.model.Utilisateur;
 import org.example.service.UtilisateurService;
 import org.example.util.Database;
+import java.io.IOException;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -56,10 +58,12 @@ public class LoginController {
                 // TODO : ouvrir dashboard Client
             } else if (user instanceof Organisateur) {
                 System.out.println("Login Organisateur réussi !");
-                // TODO : ouvrir dashboard Organisateur
+               
+            ouvrirDashboard(user);
             }
 
         } catch (Exception ex) {
+            ex.printStackTrace();
             Alert alert = new Alert(Alert.AlertType.ERROR, ex.getMessage(), ButtonType.OK);
             alert.showAndWait();
         }
@@ -83,4 +87,15 @@ public class LoginController {
         }
     }
 
+    private void ouvrirDashboard(Utilisateur utilisateur) throws IOException {
+        FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("/views/evenements-view.fxml"));
+        Parent root = loader.load();
+        EvenementController controller = loader.getController();
+        controller.initData(utilisateur);
+
+        Stage stage = (Stage) loginButton.getScene().getWindow();
+        stage.setScene(new Scene(root, 980, 720));
+        stage.setTitle("Plateforme - " + utilisateur.getTypeCompte());
+        stage.centerOnScreen();
+    }
 }
