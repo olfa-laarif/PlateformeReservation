@@ -6,6 +6,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
+import org.example.controller.ReservationController;
 import org.example.dao.UtilisateurDAO;
 import org.example.MainApplication;
 import org.example.model.Client;
@@ -54,8 +55,25 @@ public class LoginController {
             Utilisateur user = userService.login(pseudo, mdp);
 
             if (user instanceof Client) {
-                System.out.println("Login Client réussi !");
-                // TODO : ouvrir dashboard Client
+                Client client = (Client) user;
+                try {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/reservation-view.fxml"));
+                    Parent root = loader.load();
+
+                    Object ctrl = loader.getController();
+                    if (ctrl instanceof ReservationController) {
+                        ((ReservationController) ctrl).setClient(client);
+                    }
+
+                    // remplacer la racine de la scene actuelle (même fenêtre)
+                    Stage stage = (Stage) loginButton.getScene().getWindow();
+                    stage.getScene().setRoot(root);
+                    stage.setTitle("Réservation");
+                } catch (IOException ex) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR, "Impossible d'ouvrir la réservation: " + ex.getMessage(), ButtonType.OK);
+                    alert.showAndWait();
+                }
+
             } else if (user instanceof Organisateur) {
                 System.out.println("Login Organisateur réussi !");
                
