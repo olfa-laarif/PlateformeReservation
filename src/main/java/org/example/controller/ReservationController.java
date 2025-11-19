@@ -3,9 +3,7 @@ package org.example.controller;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.example.dao.EvenementDAO;
 import org.example.exception.PlacesInsuffisantesException;
@@ -67,6 +65,21 @@ public class ReservationController {
     }
 
     public void setClient(Client client) { this.client = client; }
+
+    /**
+     * Pré‑sélectionne un événement (cas où le client vient depuis
+     * la page de consultation des événements).
+     */
+    public void preselectEvent(Evenement evenement) {
+        if (evenement == null) {
+            return;
+        }
+        // s'assure que la liste est chargée puis sélectionne l'événement correspondant
+        if (eventsCombo.getItems() != null && !eventsCombo.getItems().isEmpty()) {
+            eventsCombo.getSelectionModel().select(evenement);
+            onEventSelected();
+        }
+    }
 
     private void loadEvents() throws SQLException {
         List<Evenement> events = evenementDAO.listAll();

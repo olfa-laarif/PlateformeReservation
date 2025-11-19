@@ -14,9 +14,16 @@
             <padding>
                 <Insets top="20.0" right="20.0" bottom="20.0" left="20.0"/>
             </padding>
-            <Label text="Plateforme de réservation - Gestion des événements"
-                   styleClass="title"
-                   style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+            <HBox spacing="20" alignment="CENTER_LEFT">
+                <Label text="Plateforme de réservation - Gestion des événements"
+                       styleClass="title"
+                       style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+                <!-- Bouton simple pour revenir à l'écran de connexion -->
+                <Button fx:id="retourConnexionButton"
+                        text="Retour à la connexion"
+                        onAction="#retournerALaConnexion"
+                        styleClass="secondary"/>
+            </HBox>
 
             <TitledPane text="Créer un événement (Organisateur)" fx:id="creationPane" expanded="false">
                 <VBox spacing="12.0" styleClass="card">
@@ -124,6 +131,12 @@
                             <TableColumn fx:id="placesColumn" text="Disponibles" prefWidth="100"/>
                         </columns>
                     </TableView>
+
+                    <!-- Bouton simple pour qu'un client réserve l'événement sélectionné -->
+                    <Button fx:id="reserverSelectionButton"
+                            text="Réserver l'événement sélectionné"
+                            onAction="#ouvrirReservationPourSelection"
+                            styleClass="primary"/>
 
                     <Label fx:id="statInfoLabel"
                            text="Sélectionnez un événement pour afficher les statistiques."/>
