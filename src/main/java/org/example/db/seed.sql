@@ -14,9 +14,9 @@ INSERT INTO `user` (user_id, user_name, first_name, last_name, email, password, 
 
 INSERT INTO event (event_id, name, event_type, special_guest, event_date, location, organizer_id, seat_count)
 VALUES
-(1, 'Rock Festival', 'Concert', 'Metallica', '2025-07-15 20:00:00', 'Stadium Arena', 3, 5000),
-(2, 'Magic Show', 'Spectacle', 'David Copperfield', '2025-08-01 19:00:00', 'Royal Theater', 3, 1200),
-(3, 'Tech Innovations 2025', 'Conference', 'Elon Musk', '2025-09-10 09:00:00', 'Expo Center', 3, 800);
+(1, 'Rock Festival', 'Concert', 'Metallica', '2026-07-15 20:00:00', 'Stadium Arena', 3, 5000),
+(2, 'Magic Show', 'Spectacle', 'David Copperfield', '2026-08-01 19:00:00', 'Royal Theater', 3, 1200),
+(3, 'Tech Innovations 2026', 'Conference', 'Elon Musk', '2026-09-10 09:00:00', 'Expo Center', 3, 800);
 
 
 INSERT INTO place (place_id, price, category_id, event_id) VALUES

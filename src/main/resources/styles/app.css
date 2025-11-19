@@ -1,0 +1,75 @@
+/* Global app stylesheet */
+
+.root-pane {
+    -fx-background-color: linear-gradient(#f0f4ff, #e6eefc);
+    -fx-padding: 12;
+}
+
+.card {
+    -fx-background-color: white;
+    -fx-background-radius: 10;
+    -fx-padding: 18;
+    -fx-effect: dropshadow(gaussian, rgba(34,53,111,0.12), 12, 0.2, 0, 4);
+}
+
+Label.title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #22356f;
+}
+
+Button.primary {
+    -fx-background-color: linear-gradient(#4a90e2, #3571c6);
+    -fx-text-fill: white;
+    -fx-font-weight: 600;
+    -fx-background-radius: 6;
+}
+
+Button.secondary {
+    -fx-background-color: linear-gradient(#ffffff,#f3f6fb);
+    -fx-border-color: #d7e0fb;
+    -fx-text-fill: #22356f;
+    -fx-background-radius: 6;
+}
+
+Label.status {
+    -fx-text-fill: #5a5a5a;
+}
+
+ComboBox, Spinner {
+    -fx-background-radius: 6;
+}
+
+TableView {
+    -fx-background-color: white;
+    -fx-border-color: #dfe9ff;
+    -fx-border-radius: 6;
+}
+
+/* Zebra striping and hover for table rows */
+TableRow {
+    -fx-background-color: transparent;
+}
+TableRow:filled:selected {
+    -fx-background-color: -fx-accent;
+}
+TableView .table-row-cell:odd {
+    -fx-background-color: transparent;
+}
+TableView .table-row-cell:even {
+    -fx-background-color: rgba(240,244,255,0.6);
+}
+TableRow:hover {
+    -fx-background-color: rgba(74,144,226,0.10);
+}
+
+/* Input focus */
+TextField:focused, PasswordField:focused, ComboBox:focused, Spinner:focused {
+    -fx-border-color: #4a90e2;
+    -fx-border-width: 2px;
+}
+
+/* Hover effects */
+Button.primary:hover {
+    -fx-background-color: linear-gradient(#5aa0ee,#3d82d0);
+}
