@@ -93,19 +93,25 @@ public class EvenementController {
         boolean estOrganisateur = utilisateur instanceof Organisateur;
         creationPane.setVisible(estOrganisateur);
         statsPane.setVisible(estOrganisateur);
-        if(statInfoLabel !=null)
-        { statInfoLabel.setVisible(estOrganisateur); }
-
-
+        if (statInfoLabel != null) {
+            statInfoLabel.setVisible(estOrganisateur);
+        }
+        // Le bouton "Réserver l'événement sélectionné" est uniquement utile pour un client
+        if (reserverSelectionButton != null) {
+            reserverSelectionButton.setVisible(!estOrganisateur);
+        }
     }
 
     // ------------------------------------------------------------------------
     private void configurerGestionAffichage() {
         creationPane.managedProperty().bind(creationPane.visibleProperty());
         statsPane.managedProperty().bind(statsPane.visibleProperty());
-        if(statInfoLabel!=null)
-        {
+        if (statInfoLabel != null) {
             statInfoLabel.managedProperty().bind(statInfoLabel.visibleProperty());
+        }
+        // Quand le bouton "Réserver" est caché, il ne prend plus de place dans la mise en page
+        if (reserverSelectionButton != null) {
+            reserverSelectionButton.managedProperty().bind(reserverSelectionButton.visibleProperty());
         }
         categoriesListView.setItems(categoriesEnCreation);
         categoriesListView.setPlaceholder(new Label("Ajoutez une catégorie de places"));
