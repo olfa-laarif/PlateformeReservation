@@ -3,8 +3,11 @@ package org.example.controller;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
+import org.example.MainApplication;
 import org.example.dao.EvenementDAO;
 import org.example.exception.PlacesInsuffisantesException;
 import org.example.model.Categorie;
@@ -23,6 +26,7 @@ public class ReservationController {
     @FXML private Spinner<Integer> qtySpinner;
     @FXML private Button reserveButton;
     @FXML private Button historyButton;
+    @FXML private Button backButton;
     @FXML private Label statusLabel;
 
     private Client client;
@@ -138,6 +142,26 @@ public class ReservationController {
 
         } catch (IOException e) {
             new Alert(Alert.AlertType.ERROR, "Impossible d'ouvrir l'historique: " + e.getMessage(), ButtonType.OK).showAndWait();
+        }
+    }
+
+    @FXML
+    private void onBack() {
+        try {
+            FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("/views/evenements-view.fxml"));
+            Parent root = loader.load();
+
+            Object ctrl = loader.getController();
+            if (ctrl instanceof EvenementController) {
+                ((EvenementController) ctrl).initData(client);
+            }
+
+            Stage stage = (Stage) eventsCombo.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Événements");
+            stage.centerOnScreen();
+        } catch (IOException e) {
+            new Alert(Alert.AlertType.ERROR, "Impossible de revenir aux événements: " + e.getMessage(), ButtonType.OK).showAndWait();
         }
     }
 }
