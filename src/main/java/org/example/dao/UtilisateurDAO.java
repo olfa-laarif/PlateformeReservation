@@ -3,79 +3,98 @@ package org.example.dao;
 import org.example.model.Client;
 import org.example.model.Organisateur;
 import org.example.model.Utilisateur;
-import org.example.util.Database;
 
 import java.sql.*;
 
 public class UtilisateurDAO {
 
+    private Connection connexion;
+
+    public UtilisateurDAO(Connection connexion) {
+        this.connexion = connexion;
+    }
 
     // Connexion utilisateur
     public Utilisateur login(String username, String mdp) throws SQLException {
-
         String sql = "SELECT * FROM `user` WHERE user_name = ? AND password = ?";
 
-        Connection conn = Database.getConnection();
-        PreparedStatement ps = conn.prepareStatement(sql);
+        try (PreparedStatement ps = connexion.prepareStatement(sql)) {
+            ps.setString(1, username);
+            ps.setString(2, mdp);
 
-        ps.setString(1, username);
-        ps.setString(2, mdp);
-        System.out.println("ps"+ps);
-
-        System.out.println("Tentative login : " + username + " / " + mdp);
-
-        ResultSet rs = ps.executeQuery();
-
-
-        if (rs.next()) {
-
-            String type = rs.getString("user_type");
-
-            if ("Client".equalsIgnoreCase(type)) {
-                return new Client(
-                        rs.getInt("user_id"),
-                        rs.getString("user_name"),
-                        rs.getString("first_name"),
-                        rs.getString("last_name"),
-                        rs.getString("email"),
-                        rs.getString("password")
-                );
-            } else { // Organisateur
-                return new Organisateur(
-                        rs.getInt("user_id"),
-                        rs.getString("user_name"),
-                        rs.getString("first_name"),
-                        rs.getString("last_name"),
-                        rs.getString("email"),
-                        rs.getString("password")
-                );
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    String type = rs.getString("user_type");
+                    if ("Client".equalsIgnoreCase(type)) {
+                        return new Client(
+                                rs.getInt("user_id"),
+                                rs.getString("user_name"),
+                                rs.getString("first_name"),
+                                rs.getString("last_name"),
+                                rs.getString("email"),
+                                rs.getString("password")
+                        );
+                    } else {
+                        return new Organisateur(
+                                rs.getInt("user_id"),
+                                rs.getString("user_name"),
+                                rs.getString("first_name"),
+                                rs.getString("last_name"),
+                                rs.getString("email"),
+                                rs.getString("password")
+                        );
+                    }
+                }
             }
-        }else {
-            System.out.println("Aucun utilisateur trouvé !");
         }
 
-        return null;
+        return null; // utilisateur non trouvé
     }
 
-
-    // Inscription utilisateur
-    public void addUser(Utilisateur user) throws SQLException {
+    // Création utilisateur
+    public void addUser(Utilisateur user) throws Exception {
+        if (existePseudo(user.getPseudo())) {
+            throw new Exception("Ce pseudo est déjà utilisé.");
+        }
+        if (existeEmail(user.getEmail())) {
+            throw new Exception("Cet email est déjà utilisé.");
+        }
 
         String sql = """
-            INSERT INTO `user`(username, first_name, last_name, email, password, user_type)
+            INSERT INTO `user`(user_name, first_name, last_name, email, password, user_type)
             VALUES (?, ?, ?, ?, ?, ?)
         """;
 
-        Connection conn = Database.getConnection();
-        PreparedStatement ps = conn.prepareStatement(sql);
+        try (PreparedStatement ps = connexion.prepareStatement(sql)) {
+            ps.setString(1, user.getPseudo());
+            ps.setString(2, user.getPrenom());
+            ps.setString(3, user.getNom());
+            ps.setString(4, user.getEmail());
+            ps.setString(5, user.getMotDePasse());
+            ps.setString(6, (user instanceof Client) ? "Client" : "Organisateur");
+            ps.executeUpdate();
+        }
+    }
 
-        ps.setString(1, user.getPseudo());
-        ps.setString(2, user.getPrenom());
-        ps.setString(3, user.getNom());
-        ps.setString(4, user.getEmail());
-        ps.setString(5, user.getMotDePasse());
-        ps.setString(6, (user instanceof Client) ? "Client" : "Organisateur");
+    // Vérifier email existant
+    public boolean existeEmail(String email) throws SQLException {
+        String sql = "SELECT 1 FROM user WHERE email = ?";
+        try (PreparedStatement stmt = connexion.prepareStatement(sql)) {
+            stmt.setString(1, email);
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
 
-        ps.executeUpdate();
+    // Vérifier pseudo existant
+    public boolean existePseudo(String pseudo) throws SQLException {
+        String sql = "SELECT 1 FROM user WHERE user_name = ?";
+        try (PreparedStatement stmt = connexion.prepareStatement(sql)) {
+            stmt.setString(1, pseudo);
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next();
+            }
+        }
     }
 }
