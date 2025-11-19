@@ -135,8 +135,8 @@ public class EvenementDAO {
 
     /**
      * Enregistre un événement complet :
-     *  - on crée d'abord la ligne dans la table event
-     *  - puis on génère toutes les places (une ligne par place)
+     * - on crée d'abord la ligne dans la table event
+     * - puis on génère toutes les places (une ligne par place)
      * On encapsule le tout dans une transaction pour rester cohérent.
      */
     public void saveEvenement(Evenement evenement, List<CategoriePlaceDefinition> definitions) throws SQLException {
@@ -209,9 +209,9 @@ public class EvenementDAO {
         }
         return total;
     }
-  
-  
-   /**
+
+
+    /**
      * Liste les événements (id, name, event_date, location). Utilise une classe concrète simple.
      */
     public List<Evenement> listAll() throws SQLException {
@@ -252,5 +252,6 @@ public class EvenementDAO {
                 return list;
             }
         }
+    }
 }
  
