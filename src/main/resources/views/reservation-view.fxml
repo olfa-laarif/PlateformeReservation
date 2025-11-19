@@ -7,6 +7,10 @@
         <Insets top="12" right="12" bottom="12" left="12" />
     </padding>
 
+    <HBox spacing="8" alignment="CENTER_LEFT">
+        <Button fx:id="backButton" text="← Retour" styleClass="secondary" onAction="#onBack" />
+    </HBox>
+
     <VBox spacing="12" styleClass="card">
         <Label text="Réserver des places" style="-fx-font-size:16px; -fx-font-weight:bold;" styleClass="title"/>
 
