@@ -10,7 +10,7 @@ public class UtilisateurService {
 
     public Utilisateur login(String pseudo, String mdp) throws Exception {
         Utilisateur user = utilisateurDAO.login(pseudo, mdp);
-        System.out.println("user"+user.toString());
+
 
         if (user == null) {
             throw new Exception("Identifiants incorrects.");
