@@ -21,6 +21,11 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
+/**
+ * Contrôleur JavaFX responsable de l'écran de réservation.
+ * Il permet à un client connecté de choisir un événement, une catégorie
+ * de places puis de lancer le flux de réservation et de paiement.
+ */
 public class ReservationController {
 
     @FXML private ComboBox<Evenement> eventsCombo;
@@ -35,6 +40,10 @@ public class ReservationController {
     private final EvenementDAO evenementDAO = new EvenementDAO();
     private final ReservationService reservationService = new ReservationService();
 
+    /**
+     * Initialise les composants graphiques après le chargement du FXML.
+     * Configure les convertisseurs, charge les événements et branche les actions.
+     */
     @FXML
     public void initialize() {
         qtySpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 20, 1));
@@ -70,11 +79,16 @@ public class ReservationController {
         historyButton.setOnAction(e -> openHistoryWindow());
     }
 
+    /**
+     * Injecte le client actuellement connecté pour sécuriser les opérations.
+     * @param client client authentifié
+     */
     public void setClient(Client client) { this.client = client; }
 
     /**
      * Pré‑sélectionne un événement (cas où le client vient depuis
      * la page de consultation des événements).
+     * @param evenement événement déjà choisi dans une autre vue
      */
     public void preselectEvent(Evenement evenement) {
         if (evenement == null) {
@@ -87,11 +101,17 @@ public class ReservationController {
         }
     }
 
+    /**
+     * Charge la liste des événements pour alimenter la combo.
+     */
     private void loadEvents() throws SQLException {
         List<Evenement> events = evenementDAO.listAll();
         eventsCombo.setItems(FXCollections.observableArrayList(events));
     }
 
+    /**
+     * Réagit au choix d'un événement pour afficher les catégories associées.
+     */
     private void onEventSelected() {
         Evenement ev = eventsCombo.getValue();
         categoriesCombo.getItems().clear();
@@ -105,6 +125,9 @@ public class ReservationController {
         }
     }
 
+    /**
+     * Lance la réservation : validations, appel du service puis ouverture du paiement.
+     */
     private void onReserve() {
         if (client == null) { statusLabel.setText("Client non identifié. Connectez-vous."); return; }
         Evenement ev = eventsCombo.getValue();
@@ -134,6 +157,9 @@ public class ReservationController {
         }
     }
 
+    /**
+     * Remplace la scène par la vue d'historique des réservations du client.
+     */
     private void openHistoryWindow() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/history-view.fxml"));
@@ -155,6 +181,9 @@ public class ReservationController {
         }
     }
 
+    /**
+     * Retourne sur l'écran de consultation des événements.
+     */
     @FXML
     private void onBack() {
         try {

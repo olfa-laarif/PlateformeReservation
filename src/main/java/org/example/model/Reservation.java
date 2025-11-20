@@ -4,6 +4,10 @@ import org.example.exception.AnnulationTardiveException;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Modèle représentant une réservation (client, événement, places et date).
+ * Sert de support aux vues et aux services métier.
+ */
     public class Reservation {
 
         private int idReservation;
@@ -12,6 +16,9 @@ import java.util.List;
         private LocalDateTime dateReservation;
         private List<Place> places; // Liste des places réservées
 
+        /**
+         * Construit une réservation avec les éléments nécessaires.
+         */
         public Reservation(int idReservation, Client client, Evenement evenement, List<Place> places, LocalDateTime dateReservation) {
             this.idReservation = idReservation;
             this.client = client;
@@ -20,7 +27,10 @@ import java.util.List;
             this.dateReservation = dateReservation;
         }
 
-        // Méthode pour annuler la réservation (libère les places)
+        /**
+         * Annule la réservation si la limite de 24h est respectée puis libère les places.
+         * @throws AnnulationTardiveException si la date limite est dépassée
+         */
         public void annuler() throws AnnulationTardiveException {
             LocalDateTime now = LocalDateTime.now();
 
@@ -39,6 +49,10 @@ import java.util.List;
         }
 
 
+        /**
+         * Calcule le montant total estimé à partir des places.
+         * @return total agrégé
+         */
         public double calculateTotalPrice() {
             // Pas de places
             if (this.places == null || this.places.isEmpty()) {
