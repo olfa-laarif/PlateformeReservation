@@ -10,10 +10,7 @@ import javafx.stage.Stage;
 import org.example.MainApplication;
 import org.example.dao.EvenementDAO;
 import org.example.exception.PlacesInsuffisantesException;
-import org.example.model.Categorie;
-import org.example.model.Client;
-import org.example.model.Evenement;
-import org.example.model.Reservation;
+import org.example.model.*;
 import org.example.service.PaiementService;
 import org.example.service.ReservationService;
 
@@ -21,7 +18,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-public class ReservationController {
+public class ReservationController  implements Reservable {
 
     @FXML private ComboBox<Evenement> eventsCombo;
     @FXML private ComboBox<Categorie> categoriesCombo;
@@ -66,7 +63,7 @@ public class ReservationController {
         try { loadEvents(); } catch (SQLException e) { statusLabel.setText("Erreur chargement événements: " + e.getMessage()); }
 
         eventsCombo.setOnAction(e -> onEventSelected());
-        reserveButton.setOnAction(e -> onReserve());
+        reserveButton.setOnAction(e -> onReserve()) ;
         historyButton.setOnAction(e -> openHistoryWindow());
     }
 
@@ -104,8 +101,8 @@ public class ReservationController {
             statusLabel.setText("Erreur chargement catégories: " + ex.getMessage());
         }
     }
-
-    private void onReserve() {
+    @Override
+    public void onReserve()  {
         if (client == null) { statusLabel.setText("Client non identifié. Connectez-vous."); return; }
         Evenement ev = eventsCombo.getValue();
         Categorie cat = categoriesCombo.getValue();
@@ -174,4 +171,5 @@ public class ReservationController {
             new Alert(Alert.AlertType.ERROR, "Impossible de revenir aux événements: " + e.getMessage(), ButtonType.OK).showAndWait();
         }
     }
+
 }
