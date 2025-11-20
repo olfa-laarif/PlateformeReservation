@@ -132,11 +132,17 @@
                         </columns>
                     </TableView>
 
-                    <!-- Bouton simple pour qu'un client réserve l'événement sélectionné -->
-                    <Button fx:id="reserverSelectionButton"
-                            text="Réserver l'événement sélectionné"
-                            onAction="#ouvrirReservationPourSelection"
-                            styleClass="primary"/>
+                    <!-- Actions côté client -->
+                    <HBox spacing="10">
+                        <Button fx:id="reserverSelectionButton"
+                                text="Réserver l'événement sélectionné"
+                                onAction="#ouvrirReservationPourSelection"
+                                styleClass="primary"/>
+                        <Button fx:id="historyButton"
+                                text="Historique des réservations"
+                                onAction="#ouvrirHistoriqueReservations"
+                                styleClass="secondary"/>
+                    </HBox>
 
                     <Label fx:id="statInfoLabel"
                            text="Sélectionnez un événement pour afficher les statistiques."/>

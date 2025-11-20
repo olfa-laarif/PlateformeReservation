@@ -15,6 +15,10 @@ import java.sql.SQLException;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+/**
+ * Contrôleur gérant l'historique des réservations du client.
+ * Affiche un tableau synthétique et offre l'action d'annulation.
+ */
 public class HistoryController {
 
     @FXML private TableView<ReservationSummary> table;
@@ -32,6 +36,9 @@ public class HistoryController {
     private Parent previousRoot;
     @FXML private Button backButton;
 
+    /**
+     * Configure les colonnes du tableau après chargement FXML.
+     */
     @FXML
     public void initialize() {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
@@ -58,6 +65,10 @@ public class HistoryController {
         });
     }
 
+    /**
+     * Stocke la racine précédente pour permettre un retour simple.
+     * @param previousRoot racine de la scène à restaurer
+     */
     public void setPreviousRoot(Parent previousRoot) {
         this.previousRoot = previousRoot;
         if (backButton != null) {
@@ -72,11 +83,18 @@ public class HistoryController {
         }
     }
 
+    /**
+     * Définit le client courant et charge son historique.
+     * @param client client authentifié
+     */
     public void setClient(Client client) {
         this.client = client;
         loadData();
     }
 
+    /**
+     * Charge les réservations du client et les injecte dans le tableau.
+     */
     private void loadData() {
         if (client == null) return;
         try (Connection conn = Database.getConnection()) {
@@ -88,6 +106,10 @@ public class HistoryController {
         }
     }
 
+    /**
+     * Déclenche l'annulation de la réservation sélectionnée.
+     * @param rs résumé de réservation affiché dans la table
+     */
     private void onCancel(ReservationSummary rs) {
         if (client == null) { statusLabel.setText("Client non connecté."); return; }
         try {
