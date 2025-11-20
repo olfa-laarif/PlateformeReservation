@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox xmlns:fx="http://javafx.com/fxml" spacing="8" alignment="TOP_LEFT" fx:controller="org.example.controller.ReservationController" styleClass="root-pane">
+    <padding>
+        <Insets top="12" right="12" bottom="12" left="12" />
+    </padding>
+
+    <HBox spacing="8" alignment="CENTER_LEFT">
+        <Button fx:id="backButton" text="← Retour" styleClass="secondary" onAction="#onBack" />
+    </HBox>
+
+    <VBox spacing="12" styleClass="card">
+        <Label text="Réserver des places" style="-fx-font-size:16px; -fx-font-weight:bold;" styleClass="title"/>
+
+        <HBox spacing="8">
+            <Label text="Événement:" />
+            <ComboBox fx:id="eventsCombo" prefWidth="300" />
+        </HBox>
+
+        <HBox spacing="8">
+            <Label text="Catégorie:" />
+            <ComboBox fx:id="categoriesCombo" prefWidth="200" />
+        </HBox>
+
+        <HBox spacing="8">
+            <Label text="Quantité:" />
+            <Spinner fx:id="qtySpinner" prefWidth="80" />
+        </HBox>
+
+        <HBox spacing="10">
+            <Button fx:id="reserveButton" text="Réserver" styleClass="primary" />
+        </HBox>
+
+        <Label fx:id="statusLabel" text="" styleClass="status" />
+    </VBox>
+
+</VBox>

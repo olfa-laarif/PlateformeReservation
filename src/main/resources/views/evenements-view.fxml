@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<ScrollPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.example.controller.EvenementController"
+            fitToWidth="true"
+            stylesheets="@../styles/app.css"
+            styleClass="root-pane">
+    <content>
+        <VBox spacing="16.0">
+            <padding>
+                <Insets top="20.0" right="20.0" bottom="20.0" left="20.0"/>
+            </padding>
+            <HBox spacing="20" alignment="CENTER_LEFT">
+                <Label text="Plateforme de réservation - Gestion des événements"
+                       styleClass="title"
+                       style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+                <!-- Bouton simple pour revenir à l'écran de connexion -->
+                <Button fx:id="retourConnexionButton"
+                        text="Retour à la connexion"
+                        onAction="#retournerALaConnexion"
+                        styleClass="secondary"/>
+            </HBox>
+
+            <TitledPane text="Créer un événement (Organisateur)" fx:id="creationPane" expanded="false">
+                <VBox spacing="12.0" styleClass="card">
+                    <padding>
+                        <Insets top="10.0" right="10.0" bottom="10.0" left="10.0"/>
+                    </padding>
+                    <GridPane hgap="10" vgap="10">
+                        <columnConstraints>
+                            <ColumnConstraints percentWidth="30"/>
+                            <ColumnConstraints percentWidth="70"/>
+                        </columnConstraints>
+                    <rowConstraints> <RowConstraints vgrow="NEVER"/></rowConstraints>
+
+
+                        <Label text="Nom de l'événement" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                        <TextField fx:id="nomField" promptText="Ex : Festival d'été" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                        <Label text="Type" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                        <ComboBox fx:id="typeCombo" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                        <Label text="Date" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                        <DatePicker fx:id="datePicker" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+                        <Label text="Heure (HH:mm)" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                        <TextField fx:id="heureField" promptText="20:00" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+                        <Label text="Lieu" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                        <TextField fx:id="lieuField" promptText="Ex : Grande salle" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+
+                        <Label fx:id="specialGuestLabel" text="Artiste / intervenant" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+                        <TextField fx:id="specialGuestField" promptText="Ex : Artiste principal" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+                    </GridPane>
+
+                    <Separator/>
+
+                    <Label text="Catégories de places (nom, prix, quantité)"/>
+
+                    <GridPane hgap="10" vgap="10">
+                        <columnConstraints>
+                            <ColumnConstraints percentWidth="25"/>
+                            <ColumnConstraints percentWidth="25"/>
+                            <ColumnConstraints percentWidth="20"/>
+                            <ColumnConstraints percentWidth="30"/>
+                        </columnConstraints>
+
+                        <Label text="Catégorie" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                        <ComboBox fx:id="categorieCombo" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                        <TextField fx:id="categoriePersonnaliseeField" promptText="Nom personnalisé"
+                                   GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+                        <Button fx:id="ajouterCategorieButton" text="Ajouter" GridPane.rowIndex="0" GridPane.columnIndex="3"
+                                styleClass="primary"
+                                onAction="#ajouterCategorie"/>
+
+                        <Label text="Prix (€)" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                        <Spinner fx:id="prixSpinner" editable="true" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                        <Label text="Quantité" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
+                        <Spinner fx:id="quantiteSpinner" editable="true" GridPane.rowIndex="1" GridPane.columnIndex="3"/>
+                    </GridPane>
+
+                    <HBox spacing="10">
+                        <ListView fx:id="categoriesListView" VBox.vgrow="ALWAYS" prefHeight="120"/>
+                        <VBox spacing="8">
+                            <Button fx:id="supprimerCategorieButton" text="Supprimer la sélection"
+                                    styleClass="secondary"
+                                    onAction="#supprimerCategorie"/>
+                            <Button text="Vider la liste" styleClass="secondary" onAction="#viderCategories"/>
+                        </VBox>
+                    </HBox>
+
+                    <Label fx:id="creationFeedbackLabel" style="-fx-text-fill: #cc0000;"/>
+
+                    <Button text="Créer l'événement" onAction="#creerEvenement" maxWidth="200"
+                            styleClass="primary"/>
+                </VBox>
+            </TitledPane>
+
+            <TitledPane text="Consulter les événements" expanded="true">
+                <VBox spacing="10" styleClass="card">
+                    <padding>
+                        <Insets top="10.0" right="10.0" bottom="10.0" left="10.0"/>
+                    </padding>
+                    <HBox spacing="10">
+                        <VBox spacing="5">
+                            <Label text="Type"/>
+                            <ComboBox fx:id="filtreTypeCombo" promptText="Tous"/>
+                        </VBox>
+                        <VBox spacing="5">
+                            <Label text="Lieu"/>
+                            <TextField fx:id="filtreLieuField" promptText="Rechercher un lieu"/>
+                        </VBox>
+                        <VBox spacing="5">
+                            <Label text="Artiste / intervenant"/>
+                            <TextField fx:id="filtreGuestField" promptText="Nom"/>
+                        </VBox>
+                    </HBox>
+
+                    <TableView fx:id="evenementsTable" prefHeight="260">
+                        <columns>
+                            <TableColumn fx:id="nomColumn" text="Nom" prefWidth="140"/>
+                            <TableColumn fx:id="typeColumn" text="Type" prefWidth="100"/>
+                            <TableColumn fx:id="dateColumn" text="Date" prefWidth="160"/>
+                            <TableColumn fx:id="lieuColumn" text="Lieu" prefWidth="140"/>
+                            <TableColumn fx:id="guestColumn" text="Artiste/Intervenant" prefWidth="160"/>
+                            <TableColumn fx:id="placesColumn" text="Disponibles" prefWidth="100"/>
+                        </columns>
+                    </TableView>
+
+                    <!-- Actions côté client -->
+                    <HBox spacing="10">
+                        <Button fx:id="reserverSelectionButton"
+                                text="Réserver l'événement sélectionné"
+                                onAction="#ouvrirReservationPourSelection"
+                                styleClass="primary"/>
+                        <Button fx:id="historyButton"
+                                text="Historique des réservations"
+                                onAction="#ouvrirHistoriqueReservations"
+                                styleClass="secondary"/>
+                    </HBox>
+
+                    <Label fx:id="statInfoLabel"
+                           text="Sélectionnez un événement pour afficher les statistiques."/>
+                </VBox>
+            </TitledPane>
+
+            <TitledPane text="Statistiques (Organisateur)" fx:id="statsPane" expanded="false">
+                <VBox spacing="10" styleClass="card">
+                    <padding>
+                        <Insets top="10.0" right="10.0" bottom="10.0" left="10.0"/>
+                    </padding>
+                    <Label fx:id="statTotalTicketsLabel" styleClass="status"/>
+                    <Label fx:id="statChiffreAffairesLabel" styleClass="status"/>
+                    <Label text="Taux de remplissage par catégorie" styleClass="status"/>
+                    <ListView fx:id="statCategorieListView" prefHeight="150"/>
+                </VBox>
+            </TitledPane>
+        </VBox>
+    </content>
+</ScrollPane>
