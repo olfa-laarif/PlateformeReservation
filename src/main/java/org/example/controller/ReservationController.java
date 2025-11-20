@@ -12,6 +12,8 @@ import org.example.exception.PlacesInsuffisantesException;
 import org.example.model.Categorie;
 import org.example.model.Client;
 import org.example.model.Evenement;
+import org.example.model.Reservation;
+import org.example.service.PaiementService;
 import org.example.service.ReservationService;
 
 import java.io.IOException;
@@ -94,10 +96,18 @@ public class ReservationController {
         if (ev == null || cat == null) { statusLabel.setText("Sélectionnez un événement et une catégorie."); return; }
 
         try {
-            reservationService.reserver(client, ev, cat.getIdCategorie(), qty);
+            Reservation newReservation = reservationService.reserver(client, ev, cat.getIdCategorie(), qty);
+
+            /*
             Alert a = new Alert(Alert.AlertType.INFORMATION, "Réservation effectuée.", ButtonType.OK);
             a.showAndWait();
             statusLabel.setText("Réservation réussie.");
+            */
+
+            // On ouvre la view pour le paiement
+            PaiementService paiementService = new PaiementService();
+            paiementService.openPaymentView(newReservation);
+
         } catch (PlacesInsuffisantesException ex) {
             statusLabel.setText("Pas assez de places disponibles.");
             new Alert(Alert.AlertType.WARNING, ex.getMessage(), ButtonType.OK).showAndWait();
