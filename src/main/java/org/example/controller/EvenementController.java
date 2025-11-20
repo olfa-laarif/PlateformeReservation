@@ -4,12 +4,18 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.SpinnerValueFactory.DoubleSpinnerValueFactory;
 import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory;
+import javafx.stage.Stage;
 import org.example.model.*;
 import org.example.service.EvenementService;
+import org.example.MainApplication;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -57,6 +63,8 @@ public class EvenementController {
     @FXML private TableColumn<Evenement, String> lieuColumn;
     @FXML private TableColumn<Evenement, String> guestColumn;
     @FXML private TableColumn<Evenement, String> placesColumn;
+    @FXML private Button reserverSelectionButton;
+    @FXML private Button retourConnexionButton;
 
     // --- Statistiques -------------------------------------------------------
     @FXML private Label statInfoLabel;
@@ -85,19 +93,25 @@ public class EvenementController {
         boolean estOrganisateur = utilisateur instanceof Organisateur;
         creationPane.setVisible(estOrganisateur);
         statsPane.setVisible(estOrganisateur);
-        if(statInfoLabel !=null)
-        { statInfoLabel.setVisible(estOrganisateur); }
-
-
+        if (statInfoLabel != null) {
+            statInfoLabel.setVisible(estOrganisateur);
+        }
+        // Le bouton "Réserver l'événement sélectionné" est uniquement utile pour un client
+        if (reserverSelectionButton != null) {
+            reserverSelectionButton.setVisible(!estOrganisateur);
+        }
     }
 
     // ------------------------------------------------------------------------
     private void configurerGestionAffichage() {
         creationPane.managedProperty().bind(creationPane.visibleProperty());
         statsPane.managedProperty().bind(statsPane.visibleProperty());
-        if(statInfoLabel!=null)
-        {
+        if (statInfoLabel != null) {
             statInfoLabel.managedProperty().bind(statInfoLabel.visibleProperty());
+        }
+        // Quand le bouton "Réserver" est caché, il ne prend plus de place dans la mise en page
+        if (reserverSelectionButton != null) {
+            reserverSelectionButton.managedProperty().bind(reserverSelectionButton.visibleProperty());
         }
         categoriesListView.setItems(categoriesEnCreation);
         categoriesListView.setPlaceholder(new Label("Ajoutez une catégorie de places"));
@@ -187,6 +201,16 @@ public class EvenementController {
         evenementsTable.setItems(evenementsAffiches);
         evenementsTable.getSelectionModel().selectedItemProperty()
                 .addListener((obs, ancien, selection) -> afficherStatistiques(selection));
+
+        // Bouton "Réserver" actif uniquement pour un client avec un événement sélectionné
+        if (reserverSelectionButton != null) {
+            reserverSelectionButton.setOnAction(e -> ouvrirReservationPourSelection());
+        }
+
+        // Bouton "Retour à la connexion" pour revenir à l'écran de login
+        if (retourConnexionButton != null) {
+            retourConnexionButton.setOnAction(e -> retournerALaConnexion());
+        }
     }
 
     private void rechargerEvenements() {
@@ -377,5 +401,71 @@ public class EvenementController {
         alert.setHeaderText(null);
         alert.setTitle(titre);
         alert.showAndWait();
+    }
+
+    /**
+     * Remplace la scène actuelle par l'écran de connexion.
+     * Utilisé quand l'utilisateur veut se reconnecter (changer de compte).
+     */
+    @FXML
+    private void retournerALaConnexion() {
+        try {
+            FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("/views/login-view.fxml"));
+            Parent root = loader.load();
+
+            Stage stage = (Stage) evenementsTable.getScene().getWindow();
+            stage.setScene(new Scene(root, 700, 500));
+            stage.setTitle("Connexion");
+            stage.centerOnScreen();
+        } catch (IOException e) {
+            afficherErreur("Erreur de navigation", "Impossible de revenir à la connexion : " + e.getMessage());
+        }
+    }
+
+    /**
+     * Ouvre l'écran de réservation pour l'événement sélectionné
+     * côté client, en transmettant l'utilisateur et l'événement.
+     */
+    @FXML
+    private void ouvrirReservationPourSelection() {
+        // Seuls les clients réservent
+        if (!(utilisateurConnecte instanceof Client client)) {
+            afficherErreur("Réservation impossible", "Seuls les clients peuvent réserver des tickets.");
+            return;
+        }
+
+        Evenement selection = evenementsTable.getSelectionModel().getSelectedItem();
+        if (selection == null) {
+            afficherErreur("Aucun événement sélectionné", "Veuillez d'abord choisir un événement dans la liste.");
+            return;
+        }
+
+        // 🔎 Vérifier s'il reste des places avant d'ouvrir la fenêtre de réservation
+        if (selection.getNombrePlacesDisponibles() <= 0) {
+            afficherErreur(
+                    "Plus de places disponibles",
+                    "Toutes les places pour cet événement ont déjà été réservées.\n"
+                            + "Veuillez choisir un autre événement."
+            );
+            return; // on ne redirige pas vers la fenêtre de réservation
+        }
+
+        try {
+            FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("/views/reservation-view.fxml"));
+            Parent root = loader.load();
+
+            Object ctrl = loader.getController();
+            if (ctrl instanceof ReservationController reservationController) {
+                reservationController.setClient(client);
+                reservationController.preselectEvent(selection);
+            }
+
+            Stage stage = (Stage) evenementsTable.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Réservation - " + selection.getNom());
+            stage.centerOnScreen();
+        } catch (IOException e) {
+            afficherErreur("Erreur d'ouverture", "Impossible d'ouvrir l'écran de réservation : " + e.getMessage());
+        }
     }
 }
