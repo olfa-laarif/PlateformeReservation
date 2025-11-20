@@ -38,6 +38,17 @@ import java.util.List;
             System.out.println("Réservation annulée pour l'événement " + evenement.getNom());
         }
 
+
+        public double calculateTotalPrice() {
+            // Pas de places
+            if (this.places == null || this.places.isEmpty()) {
+                return 0.0;
+            }
+
+            return this.places.size() * this.places.getFirst().getPrix();
+        }
+
+
         // Getters et setters
         public int getIdReservation() { return idReservation; }
         public Client getClient() { return client; }
