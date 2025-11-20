@@ -15,6 +15,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Service métier regroupant les opérations de gestion des réservations :
+ * création transactionnelle, annulation et validations associées.
+ */
 public class ReservationService {
 
 	private final PlaceDAO placeDAO = new PlaceDAO();
@@ -23,6 +27,12 @@ public class ReservationService {
 	/**
 	 * Réserve `nbPlaces` places pour le client sur l'événement et la catégorie fournis.
 	 * Recherche des places libres, les marque réservées et crée la réservation (transactionnel).
+	 * @param client client demandeur
+	 * @param event événement sélectionné
+	 * @param categoryId identifiant de catégorie de siège
+	 * @param nbPlaces quantité désirée
+	 * @return réservation matérialisée avec les places retenues
+	 * @throws PlacesInsuffisantesException si le stock est insuffisant
 	 */
 	public Reservation reserver(Client client, Evenement event, int categoryId, int nbPlaces) throws PlacesInsuffisantesException {
 		try {
@@ -44,7 +54,10 @@ public class ReservationService {
 	}
 
 	/**
-	 * Annule une réservation : remet les places libres et supprime la réservation.
+	 * Annule une réservation : vérifie la propriété, la fenêtre temporelle puis libère les places.
+	 * @param reservationId identifiant à supprimer
+	 * @param client propriétaire attendu de la réservation
+	 * @throws Exception si l'annulation est refusée ou échoue
 	 */
 	public void annulerReservation(int reservationId, Client client) throws Exception {
 		try {

@@ -18,13 +18,17 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-public class ReservationController  implements Reservable {
+/**
+ * Contrôleur JavaFX responsable de l'écran de réservation.
+ * Il permet à un client connecté de choisir un événement, une catégorie
+ * de places puis de lancer le flux de réservation et de paiement.
+ */
+public class ReservationController {
 
     @FXML private ComboBox<Evenement> eventsCombo;
     @FXML private ComboBox<Categorie> categoriesCombo;
     @FXML private Spinner<Integer> qtySpinner;
     @FXML private Button reserveButton;
-    @FXML private Button historyButton;
     @FXML private Button backButton;
     @FXML private Label statusLabel;
 
@@ -32,6 +36,10 @@ public class ReservationController  implements Reservable {
     private final EvenementDAO evenementDAO = new EvenementDAO();
     private final ReservationService reservationService = new ReservationService();
 
+    /**
+     * Initialise les composants graphiques après le chargement du FXML.
+     * Configure les convertisseurs, charge les événements et branche les actions.
+     */
     @FXML
     public void initialize() {
         qtySpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 20, 1));
@@ -67,11 +75,16 @@ public class ReservationController  implements Reservable {
         historyButton.setOnAction(e -> openHistoryWindow());
     }
 
+    /**
+     * Injecte le client actuellement connecté pour sécuriser les opérations.
+     * @param client client authentifié
+     */
     public void setClient(Client client) { this.client = client; }
 
     /**
      * Pré‑sélectionne un événement (cas où le client vient depuis
      * la page de consultation des événements).
+     * @param evenement événement déjà choisi dans une autre vue
      */
     public void preselectEvent(Evenement evenement) {
         if (evenement == null) {
@@ -84,11 +97,17 @@ public class ReservationController  implements Reservable {
         }
     }
 
+    /**
+     * Charge la liste des événements pour alimenter la combo.
+     */
     private void loadEvents() throws SQLException {
         List<Evenement> events = evenementDAO.listAll();
         eventsCombo.setItems(FXCollections.observableArrayList(events));
     }
 
+    /**
+     * Réagit au choix d'un événement pour afficher les catégories associées.
+     */
     private void onEventSelected() {
         Evenement ev = eventsCombo.getValue();
         categoriesCombo.getItems().clear();
@@ -101,8 +120,11 @@ public class ReservationController  implements Reservable {
             statusLabel.setText("Erreur chargement catégories: " + ex.getMessage());
         }
     }
-    @Override
-    public void onReserve()  {
+
+    /**
+     * Lance la réservation : validations, appel du service puis ouverture du paiement.
+     */
+    private void onReserve() {
         if (client == null) { statusLabel.setText("Client non identifié. Connectez-vous."); return; }
         Evenement ev = eventsCombo.getValue();
         Categorie cat = categoriesCombo.getValue();
@@ -131,27 +153,9 @@ public class ReservationController  implements Reservable {
         }
     }
 
-    private void openHistoryWindow() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/history-view.fxml"));
-            javafx.scene.Parent historyRoot = loader.load();
-            Object ctrl = loader.getController();
-            if (ctrl instanceof HistoryController) {
-                ((HistoryController) ctrl).setClient(client);
-                // passer la racine actuelle pour permettre un retour
-                ((HistoryController) ctrl).setPreviousRoot(eventsCombo.getScene().getRoot());
-            }
-
-            // remplacer la racine de la scene (même fenêtre)
-            Stage stage = (Stage) eventsCombo.getScene().getWindow();
-            stage.getScene().setRoot(historyRoot);
-            stage.setTitle("Historique des réservations");
-
-        } catch (IOException e) {
-            new Alert(Alert.AlertType.ERROR, "Impossible d'ouvrir l'historique: " + e.getMessage(), ButtonType.OK).showAndWait();
-        }
-    }
-
+    /**
+     * Retourne sur l'écran de consultation des événements.
+     */
     @FXML
     private void onBack() {
         try {

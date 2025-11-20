@@ -25,7 +25,26 @@ import java.time.format.DateTimeParseException;
 import java.util.*;
 
 /**
- * Contrôleur "Gestion des événements".
+ * Contrôleur principal pour la **gestion des événements**.
+ * <p>
+ * Il regroupe trois grands volets fonctionnels :
+ * <ul>
+ *     <li><b>Création d'événements</b> (côté organisateur) :
+ *     saisie du nom, type, date/heure, lieu, intervenant, catégories de places,
+ *     prix et quantités, puis enregistrement en base.</li>
+ *     <li><b>Consultation d'événements</b> (côté client) :
+ *     affichage d'une liste triée par date avec filtres sur le type, le lieu
+ *     et l'artiste/intervenant.</li>
+ *     <li><b>Statistiques</b> (côté organisateur) :
+ *     affichage du nombre de tickets vendus, du chiffre d'affaires et du taux
+ *     de remplissage par catégorie.</li>
+ * </ul>
+ * Il gère aussi la navigation :
+ * <ul>
+ *     <li>Retour à l'écran de connexion.</li>
+ *     <li>Redirection vers l'écran de réservation d'un événement sélectionné
+ *     pour un client.</li>
+ * </ul>
  */
 public class EvenementController {
 
@@ -64,6 +83,7 @@ public class EvenementController {
     @FXML private TableColumn<Evenement, String> guestColumn;
     @FXML private TableColumn<Evenement, String> placesColumn;
     @FXML private Button reserverSelectionButton;
+    @FXML private Button historyButton;
     @FXML private Button retourConnexionButton;
 
     // --- Statistiques -------------------------------------------------------
@@ -79,6 +99,18 @@ public class EvenementController {
     private Utilisateur utilisateurConnecte;
 
     // ------------------------------------------------------------------------
+    /**
+     * Méthode appelée automatiquement par JavaFX juste après le chargement du FXML.
+     * <p>
+     * Elle prépare l'écran en :
+     * <ul>
+     *     <li>configurant l'affichage des différentes sections,</li>
+     *     <li>initialisant le formulaire de création d'événement,</li>
+     *     <li>configurant les filtres de recherche,</li>
+     *     <li>configurant le tableau des événements,</li>
+     *     <li>chargeant la liste des événements depuis la base.</li>
+     * </ul>
+     */
     @FXML
     public void initialize() {
         configurerGestionAffichage();
@@ -88,6 +120,20 @@ public class EvenementController {
         rechargerEvenements();
     }
 
+    /**
+     * Initialise le contrôleur avec l'utilisateur actuellement connecté.
+     * <p>
+     * Cette méthode est appelée par le contrôleur de connexion après une
+     * authentification réussie. Elle adapte l'interface selon le type
+     * d'utilisateur :
+     * <ul>
+     *     <li><b>Organisateur</b> : accès à la création d'événements et aux statistiques.</li>
+     *     <li><b>Client</b> : accès uniquement à la liste des événements
+     *     et au bouton de réservation.</li>
+     * </ul>
+     *
+     * @param utilisateur utilisateur connecté (client ou organisateur)
+     */
     public void initData(Utilisateur utilisateur) {
         utilisateurConnecte = utilisateur;
         boolean estOrganisateur = utilisateur instanceof Organisateur;
@@ -100,9 +146,20 @@ public class EvenementController {
         if (reserverSelectionButton != null) {
             reserverSelectionButton.setVisible(!estOrganisateur);
         }
+        if (historyButton != null) {
+            historyButton.setVisible(!estOrganisateur);
+        }
     }
 
     // ------------------------------------------------------------------------
+    /**
+     * Configure le comportement d'affichage des différentes sections.
+     * <p>
+     * On lie les propriétés {@code managed} et {@code visible} pour que
+     * les panneaux ou boutons masqués ne prennent plus de place dans la
+     * mise en page. On initialise également la liste des catégories en
+     * cours de création.
+     */
     private void configurerGestionAffichage() {
         creationPane.managedProperty().bind(creationPane.visibleProperty());
         statsPane.managedProperty().bind(statsPane.visibleProperty());
@@ -113,10 +170,22 @@ public class EvenementController {
         if (reserverSelectionButton != null) {
             reserverSelectionButton.managedProperty().bind(reserverSelectionButton.visibleProperty());
         }
+        // La liste affiche directement le contenu de categoriesEnCreation
+        if (historyButton != null) {
+            historyButton.managedProperty().bind(historyButton.visibleProperty());
+        }
         categoriesListView.setItems(categoriesEnCreation);
         categoriesListView.setPlaceholder(new Label("Ajoutez une catégorie de places"));
     }
 
+    /**
+     * Initialise le formulaire de création d'événement avec des valeurs par défaut.
+     * <p>
+     * - Configure les spinners (prix, quantité).<br>
+     * - Alimente la combo de type d'événement et de catégories de places.<br>
+     * - Positionne la date par défaut (demain) et l'heure par défaut (20:00).<br>
+     * - Vide le message de retour de création.
+     */
     private void configurerFormulaireCreation() {
         configurerSpinners();
         configurerTypeCombo();
@@ -126,6 +195,12 @@ public class EvenementController {
         creationFeedbackLabel.setText("");
     }
 
+    /**
+     * Configure les spinners de prix et de quantité pour les catégories de places.
+     * <p>
+     * - Prix : de 5€ à 1000€, pas de 5€.<br>
+     * - Quantité : de 1 à 1000, pas de 1.
+     */
     private void configurerSpinners() {
         DoubleSpinnerValueFactory prixFactory = new DoubleSpinnerValueFactory(5, 1000, 50, 5);
         prixSpinner.setValueFactory(prixFactory);
@@ -134,6 +209,12 @@ public class EvenementController {
         quantiteSpinner.setValueFactory(quantiteFactory);
     }
 
+    /**
+     * Configure la liste déroulante du type d'événement.
+     * <p>
+     * Ajoute les valeurs possibles (Concert, Spectacle, Conference) et met
+     * à jour le libellé de l'artiste/intervenant en fonction du type.
+     */
     private void configurerTypeCombo() {
         typeCombo.getItems().setAll("Concert", "Spectacle", "Conference");
         typeCombo.getSelectionModel().selectFirst();
@@ -141,6 +222,12 @@ public class EvenementController {
         mettreAJourLibelleSpecialGuest(typeCombo.getValue());
     }
 
+    /**
+     * Met à jour le texte du label décrivant le champ "special guest"
+     * selon le type d'événement sélectionné.
+     *
+     * @param typeEvenement type choisi (Concert, Spectacle, Conference)
+     */
     private void mettreAJourLibelleSpecialGuest(String typeEvenement) {
         if ("Conference".equals(typeEvenement)) {
             specialGuestLabel.setText("Intervenant principal");
@@ -151,6 +238,12 @@ public class EvenementController {
         }
     }
 
+    /**
+     * Configure la liste déroulante des catégories de places.
+     * <p>
+     * - Active ou désactive le champ de catégorie personnalisée selon le choix.<br>
+     * - Charge la liste des catégories depuis la base (ou valeurs par défaut).
+     */
     private void configurerCategorieCombo() {
         categoriePersonnaliseeField.setDisable(true);
         categorieCombo.valueProperty().addListener((obs, oldValue, newValue) ->
@@ -158,6 +251,13 @@ public class EvenementController {
         chargerCategoriesDepuisBdd();
     }
 
+    /**
+     * Charge la liste des catégories de places depuis la base de données
+     * via le service d'événements.
+     * <p>
+     * En cas d'erreur SQL, des catégories par défaut sont utilisées
+     * (VIP, Gold, Silver, Standard).
+     */
     private void chargerCategoriesDepuisBdd() {
         List<String> categories;
         try {
@@ -176,6 +276,12 @@ public class EvenementController {
     }
 
     // ------------------------------------------------------------------------
+    /**
+     * Configure les filtres de recherche d'événements (type, lieu, guest).
+     * <p>
+     * Chaque modification de filtre déclenche un recalcul de la liste
+     * d'événements affichés.
+     */
     private void configurerFiltres() {
         filtreTypeCombo.getItems().setAll("Tous", "Concert", "Spectacle", "Conference");
         filtreTypeCombo.getSelectionModel().selectFirst();
@@ -185,6 +291,14 @@ public class EvenementController {
         filtreGuestField.textProperty().addListener((obs, o, n) -> appliquerFiltres());
     }
 
+    /**
+     * Configure les colonnes du tableau des événements et les actions associées.
+     * <p>
+     * - Définit comment chaque colonne lit les données d'un objet {@link Evenement}.<br>
+     * - Relie la liste observable {@code evenementsAffiches} à la table.<br>
+     * - Met à jour les statistiques quand la sélection change.<br>
+     * - Configure les actions des boutons de réservation et de retour à la connexion.
+     */
     private void configurerTableau() {
         nomColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getNom()));
         typeColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getTypeEvenement()));
@@ -206,6 +320,9 @@ public class EvenementController {
         if (reserverSelectionButton != null) {
             reserverSelectionButton.setOnAction(e -> ouvrirReservationPourSelection());
         }
+        if (historyButton != null) {
+            historyButton.setOnAction(e -> ouvrirHistoriqueReservations());
+        }
 
         // Bouton "Retour à la connexion" pour revenir à l'écran de login
         if (retourConnexionButton != null) {
@@ -213,6 +330,10 @@ public class EvenementController {
         }
     }
 
+    /**
+     * Recharge la liste complète des événements depuis la base de données,
+     * trie les événements par date, puis applique les filtres en cours.
+     */
     private void rechargerEvenements() {
         try {
             evenements.setAll(evenementService.chargerEvenements());
@@ -223,6 +344,11 @@ public class EvenementController {
         }
     }
 
+    /**
+     * Applique les filtres saisis (type, lieu, artiste/intervenant)
+     * à la liste complète des événements, puis met à jour la liste
+     * observable {@code evenementsAffiches} utilisée par la table.
+     */
     private void appliquerFiltres() {
         List<Evenement> resultat = new ArrayList<>();
         for (Evenement evt : evenements) {
@@ -233,6 +359,13 @@ public class EvenementController {
         evenementsAffiches.setAll(resultat);
     }
 
+    /**
+     * Indique si un événement correspond aux filtres actuellement saisis.
+     *
+     * @param evt événement à tester
+     * @return {@code true} si l'événement correspond à tous les filtres,
+     *         {@code false} sinon
+     */
     private boolean correspondFiltre(Evenement evt) {
         if (evt == null) {
             return false;
@@ -257,11 +390,28 @@ public class EvenementController {
         return true;
     }
 
+    /**
+     * Vérifie si un texte est null ou ne contient que des espaces.
+     *
+     * @param texte texte à tester
+     * @return {@code true} si le texte est null ou vide/blanc, sinon {@code false}
+     */
     private boolean estVide(String texte) {
         return texte == null || texte.isBlank();
     }
 
     // ------------------------------------------------------------------------
+    /**
+     * Ajoute une catégorie de places (nom, prix, quantité) à la liste
+     * des catégories en cours de création pour l'événement.
+     * <p>
+     * Effectue plusieurs contrôles :
+     * <ul>
+     *     <li>le nom de catégorie ne doit pas être vide,</li>
+     *     <li>le prix et la quantité doivent être strictement positifs.</li>
+     * </ul>
+     * Affiche des messages d'erreur dans {@code creationFeedbackLabel} si besoin.
+     */
     @FXML
     private void ajouterCategorie() {
         String nomCategorie = recupererNomCategorieSaisi();
@@ -281,6 +431,15 @@ public class EvenementController {
         creationFeedbackLabel.setText("");
     }
 
+    /**
+     * Récupère le nom de catégorie choisi ou saisi par l'utilisateur.
+     * <p>
+     * Si la valeur sélectionnée dans la combo est "Personnalisée",
+     * le texte vient du champ de saisie libre, sinon on renvoie
+     * directement la valeur sélectionnée.
+     *
+     * @return nom de la catégorie souhaitée
+     */
     private String recupererNomCategorieSaisi() {
         String choix = categorieCombo.getValue();
         if ("Personnalisée".equals(choix)) {
@@ -289,6 +448,10 @@ public class EvenementController {
         return choix;
     }
 
+    /**
+     * Supprime de la liste la catégorie actuellement sélectionnée
+     * dans la {@link ListView} des catégories en cours de création.
+     */
     @FXML
     private void supprimerCategorie() {
         CategoriePlaceDefinition selection = categoriesListView.getSelectionModel().getSelectedItem();
@@ -297,12 +460,29 @@ public class EvenementController {
         }
     }
 
+    /**
+     * Vide complètement la liste des catégories en cours de création.
+     */
     @FXML
     private void viderCategories() {
         categoriesEnCreation.clear();
     }
 
     // ------------------------------------------------------------------------
+    /**
+     * Tente de créer un nouvel événement avec les informations saisies
+     * dans le formulaire de création.
+     * <p>
+     * Étapes principales :
+     * <ul>
+     *     <li>Vérifier que l'utilisateur est un organisateur.</li>
+     *     <li>Contrôler les champs obligatoires (nom, date, heure, lieu, intervenant).</li>
+     *     <li>Vérifier la présence d'au moins une catégorie de places.</li>
+     *     <li>Construire l'objet {@link Evenement} correspondant au type choisi.</li>
+     *     <li>Appeler le service pour l'enregistrer en base (événement + places).</li>
+     * </ul>
+     * Affiche un message de succès ou d'erreur dans {@code creationFeedbackLabel}.
+     */
     @FXML
     private void creerEvenement() {
         creationFeedbackLabel.setStyle("-fx-text-fill: #cc0000;");
@@ -344,6 +524,18 @@ public class EvenementController {
         }
     }
 
+    /**
+     * Construit une instance concrète d'{@link Evenement} (Concert, Spectacle
+     * ou Conference) en fonction du type choisi.
+     *
+     * @param type          type d'événement ("Concert", "Spectacle", "Conference")
+     * @param nom           nom de l'événement
+     * @param date          date et heure de l'événement
+     * @param lieu          lieu de l'événement
+     * @param specialGuest  artiste / intervenant / troupe
+     * @param organisateur  organisateur propriétaire de l'événement
+     * @return une instance de {@link Concert}, {@link Spectacle} ou {@link Conference}
+     */
     private Evenement construireEvenement(String type, String nom, LocalDateTime date, String lieu,
                                           String specialGuest, Organisateur organisateur) {
         return switch (type) {
@@ -353,6 +545,14 @@ public class EvenementController {
         };
     }
 
+    /**
+     * Lit et convertit le texte saisi dans le champ heure en {@link LocalTime}.
+     * <p>
+     * Si le format est invalide (non conforme à HH:mm), un message d'erreur
+     * est affiché et la méthode renvoie {@code null}.
+     *
+     * @return l'heure saisie ou {@code null} si le format est incorrect
+     */
     private LocalTime lireHeure() {
         try {
             return LocalTime.parse(heureField.getText());
@@ -362,6 +562,11 @@ public class EvenementController {
         }
     }
 
+    /**
+     * Réinitialise tous les champs du formulaire de création d'événement
+     * aux valeurs par défaut (date de demain, heure par défaut, champs vides,
+     * liste de catégories en cours de création vidée).
+     */
     private void reinitialiserFormulaire() {
         nomField.clear();
         datePicker.setValue(LocalDate.now().plusDays(1));
@@ -374,6 +579,19 @@ public class EvenementController {
     }
 
     // ------------------------------------------------------------------------
+    /**
+     * Affiche les statistiques pour l'événement sélectionné, uniquement
+     * si l'utilisateur connecté est un organisateur.
+     * <p>
+     * Les informations affichées sont :
+     * <ul>
+     *     <li>nombre de tickets vendus / capacité totale,</li>
+     *     <li>chiffre d'affaires total,</li>
+     *     <li>taux de remplissage par catégorie de place.</li>
+     * </ul>
+     *
+     * @param evenement événement sélectionné dans le tableau
+     */
     private void afficherStatistiques(Evenement evenement) {
         if (!(utilisateurConnecte instanceof Organisateur) || evenement == null) {
             statTotalTicketsLabel.setText("");
@@ -396,6 +614,13 @@ public class EvenementController {
         statCategorieListView.getItems().setAll(lignes);
     }
 
+    /**
+     * Affiche une boîte de dialogue d'erreur JavaFX avec un titre
+     * et un message fourni.
+     *
+     * @param titre   titre de la fenêtre d'erreur
+     * @param message message détaillé à afficher
+     */
     private void afficherErreur(String titre, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR, message, ButtonType.OK);
         alert.setHeaderText(null);
@@ -404,8 +629,41 @@ public class EvenementController {
     }
 
     /**
+     * Affiche l'historique des réservations pour le client connecté.
+     */
+    @FXML
+    private void ouvrirHistoriqueReservations() {
+        if (!(utilisateurConnecte instanceof Client client)) {
+            afficherErreur("Historique indisponible", "Seuls les clients peuvent accéder à l'historique.");
+            return;
+        }
+
+        try {
+            FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("/views/history-view.fxml"));
+            Parent historyRoot = loader.load();
+
+            Object ctrl = loader.getController();
+            if (ctrl instanceof HistoryController historyController && historyButton != null) {
+                historyController.setClient(client);
+                historyController.setPreviousRoot(historyButton.getScene().getRoot());
+            }
+
+            if (historyButton != null) {
+                Stage stage = (Stage) historyButton.getScene().getWindow();
+                stage.getScene().setRoot(historyRoot);
+                stage.setTitle("Historique des réservations");
+            }
+        } catch (IOException e) {
+            afficherErreur("Erreur d'ouverture", "Impossible d'ouvrir l'historique : " + e.getMessage());
+        }
+    }
+
+    /**
      * Remplace la scène actuelle par l'écran de connexion.
+     * <p>
      * Utilisé quand l'utilisateur veut se reconnecter (changer de compte).
+     * Charge le fichier {@code login-view.fxml} et replace la scène du stage
+     * courant par la scène de connexion.
      */
     @FXML
     private void retournerALaConnexion() {
@@ -425,6 +683,17 @@ public class EvenementController {
     /**
      * Ouvre l'écran de réservation pour l'événement sélectionné
      * côté client, en transmettant l'utilisateur et l'événement.
+     * <p>
+     * Étapes :
+     * <ul>
+     *     <li>Vérifie que l'utilisateur connecté est un {@link Client}.</li>
+     *     <li>Vérifie qu'un événement est sélectionné dans le tableau.</li>
+     *     <li>Contrôle qu'il reste des places disponibles pour cet événement.</li>
+     *     <li>Charge la vue {@code reservation-view.fxml}.</li>
+     *     <li>Passe le client et l'événement sélectionné au {@link ReservationController}.</li>
+     *     <li>Remplace la scène courante par l'écran de réservation.</li>
+     * </ul>
+     * En cas de problème, un message d'erreur lisible est affiché.
      */
     @FXML
     private void ouvrirReservationPourSelection() {

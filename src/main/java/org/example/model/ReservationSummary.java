@@ -2,6 +2,9 @@ package org.example.model;
 
 import java.time.LocalDateTime;
 
+/**
+ * DTO utilisé pour afficher une réservation agrégée dans l'historique.
+ */
 public class ReservationSummary {
     private int reservationId;
     private String eventName;
