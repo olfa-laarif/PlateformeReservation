@@ -83,6 +83,7 @@ public class EvenementController {
     @FXML private TableColumn<Evenement, String> guestColumn;
     @FXML private TableColumn<Evenement, String> placesColumn;
     @FXML private Button reserverSelectionButton;
+    @FXML private Button historyButton;
     @FXML private Button retourConnexionButton;
 
     // --- Statistiques -------------------------------------------------------
@@ -145,6 +146,9 @@ public class EvenementController {
         if (reserverSelectionButton != null) {
             reserverSelectionButton.setVisible(!estOrganisateur);
         }
+        if (historyButton != null) {
+            historyButton.setVisible(!estOrganisateur);
+        }
     }
 
     // ------------------------------------------------------------------------
@@ -167,6 +171,9 @@ public class EvenementController {
             reserverSelectionButton.managedProperty().bind(reserverSelectionButton.visibleProperty());
         }
         // La liste affiche directement le contenu de categoriesEnCreation
+        if (historyButton != null) {
+            historyButton.managedProperty().bind(historyButton.visibleProperty());
+        }
         categoriesListView.setItems(categoriesEnCreation);
         categoriesListView.setPlaceholder(new Label("Ajoutez une catégorie de places"));
     }
@@ -312,6 +319,9 @@ public class EvenementController {
         // Bouton "Réserver" actif uniquement pour un client avec un événement sélectionné
         if (reserverSelectionButton != null) {
             reserverSelectionButton.setOnAction(e -> ouvrirReservationPourSelection());
+        }
+        if (historyButton != null) {
+            historyButton.setOnAction(e -> ouvrirHistoriqueReservations());
         }
 
         // Bouton "Retour à la connexion" pour revenir à l'écran de login
@@ -616,6 +626,36 @@ public class EvenementController {
         alert.setHeaderText(null);
         alert.setTitle(titre);
         alert.showAndWait();
+    }
+
+    /**
+     * Affiche l'historique des réservations pour le client connecté.
+     */
+    @FXML
+    private void ouvrirHistoriqueReservations() {
+        if (!(utilisateurConnecte instanceof Client client)) {
+            afficherErreur("Historique indisponible", "Seuls les clients peuvent accéder à l'historique.");
+            return;
+        }
+
+        try {
+            FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("/views/history-view.fxml"));
+            Parent historyRoot = loader.load();
+
+            Object ctrl = loader.getController();
+            if (ctrl instanceof HistoryController historyController && historyButton != null) {
+                historyController.setClient(client);
+                historyController.setPreviousRoot(historyButton.getScene().getRoot());
+            }
+
+            if (historyButton != null) {
+                Stage stage = (Stage) historyButton.getScene().getWindow();
+                stage.getScene().setRoot(historyRoot);
+                stage.setTitle("Historique des réservations");
+            }
+        } catch (IOException e) {
+            afficherErreur("Erreur d'ouverture", "Impossible d'ouvrir l'historique : " + e.getMessage());
+        }
     }
 
     /**

@@ -9,10 +9,15 @@ import org.example.model.Organisateur;
 import org.example.model.Utilisateur;
 import org.example.service.UtilisateurService;
 import org.example.util.Database;
-
 import java.sql.Connection;
 import java.sql.SQLException;
 
+
+/**
+ * Contrôleur responsable de la gestion du formulaire d'inscription.
+ * Il permet de créer un nouveau compte utilisateur (Client ou Organisateur),
+ * de valider les informations saisies et de gérer la fermeture de la fenêtre.
+ */
 public class SignUpController {
 
     @FXML
@@ -42,6 +47,12 @@ public class SignUpController {
     private UtilisateurService userService;
 
 
+    /**
+     * Initialise le contrôleur après le chargement de la vue FXML.
+     * Configure la connexion au service utilisateur, initialise la liste
+     * des types de compte disponibles et associe les actions aux boutons
+     * du formulaire d'inscription.
+     */
     public void initialize() {
         try {
             // Initialiser service avec DAO et connexion
@@ -65,7 +76,15 @@ public class SignUpController {
         cancelButton.setOnAction(e -> fermerFenetre());
     }
 
-
+    /**
+     * Crée un nouveau compte utilisateur à partir des informations saisies
+     * dans le formulaire. Les données sont validées (champs obligatoires,
+     * format d'email, type de compte), puis un objet Client ou Organisateur
+     * est créé et enregistré via le service utilisateur.
+     *
+     * Affiche une alerte de confirmation en cas de succès, ou une alerte
+     * d'erreur en cas de problème (validation, base de données, etc.).
+     */
     private void creerCompte() {
         String pseudo = pseudoField.getText().trim();
         String prenom = prenomField.getText().trim();
@@ -104,6 +123,11 @@ public class SignUpController {
         }
     }
 
+    /**
+     * Ferme la fenêtre d'inscription.
+     * Cette méthode est appelée lors du clic sur le bouton « Annuler »
+     * ou après la création réussie d'un compte.
+     */
     private void fermerFenetre() {
         Stage stage = (Stage) cancelButton.getScene().getWindow();
         stage.close();

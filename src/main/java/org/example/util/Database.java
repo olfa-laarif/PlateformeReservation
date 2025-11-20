@@ -4,12 +4,25 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+
+/**
+ * Classe utilitaire responsable de la gestion de la connexion à la base de données.
+ * Elle fournit une méthode statique permettant d'établir une connexion JDBC
+ * à la base MySQL utilisée par l'application.
+ */
 public class Database {
 
     private static final String URL = "jdbc:mysql://localhost:3306/BDReservation";
     private static final String USER = "root";
     private static final String PASSWORD = "";
 
+    /**
+     * Établit et retourne une connexion à la base de données MySQL.
+     *
+     * @return une connexion JDBC active.
+     * @throws SQLException si la connexion ne peut pas être établie
+     * (serveur inaccessible,identifiants incorrects, base inexistante, etc.).
+     */
     public static Connection getConnection() throws SQLException {
         return DriverManager.getConnection(URL, USER, PASSWORD);
     }

@@ -11,6 +11,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * DAO dédié aux opérations d'accès/écriture pour les réservations
+ * (création, listing agrégé, récupération des places et suppression).
+ */
 public class ReservationDAO {
 
     /**
