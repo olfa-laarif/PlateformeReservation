@@ -72,7 +72,7 @@ public class ReservationController {
 
         eventsCombo.setOnAction(e -> onEventSelected());
         reserveButton.setOnAction(e -> onReserve()) ;
-        historyButton.setOnAction(e -> openHistoryWindow());
+        //historyButton.setOnAction(e -> openHistoryWindow());
     }
 
     /**
