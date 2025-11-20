@@ -10,10 +10,7 @@ import javafx.stage.Stage;
 import org.example.MainApplication;
 import org.example.dao.EvenementDAO;
 import org.example.exception.PlacesInsuffisantesException;
-import org.example.model.Categorie;
-import org.example.model.Client;
-import org.example.model.Evenement;
-import org.example.model.Reservation;
+import org.example.model.*;
 import org.example.service.PaiementService;
 import org.example.service.ReservationService;
 
@@ -74,7 +71,8 @@ public class ReservationController {
         try { loadEvents(); } catch (SQLException e) { statusLabel.setText("Erreur chargement événements: " + e.getMessage()); }
 
         eventsCombo.setOnAction(e -> onEventSelected());
-        reserveButton.setOnAction(e -> onReserve());
+        reserveButton.setOnAction(e -> onReserve()) ;
+        historyButton.setOnAction(e -> openHistoryWindow());
     }
 
     /**
@@ -177,4 +175,5 @@ public class ReservationController {
             new Alert(Alert.AlertType.ERROR, "Impossible de revenir aux événements: " + e.getMessage(), ButtonType.OK).showAndWait();
         }
     }
+
 }
