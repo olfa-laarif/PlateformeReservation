@@ -24,8 +24,21 @@ public class LoginController {
     @FXML private Button loginButton;
     @FXML private Button signupButton;
 
+
+    /**
+     * Contrôleur responsable de la gestion de l'écran de connexion.
+     * Il permet d'initialiser les composants, de gérer la connexion de
+     * l'utilisateur et l'ouverture de la page d'inscription.
+     *
+     */
     private UtilisateurService userService;
 
+    /**
+     * Initialise le contrôleur après le chargement de la vue FXML.
+     * Cette méthode configure la connexion à la base de données,
+     * initialise le service utilisateur et associe les actions aux
+     * boutons de connexion et d'inscription.
+     */
     @FXML
     public void initialize() {
         try {
@@ -44,6 +57,12 @@ public class LoginController {
         signupButton.setOnAction(e -> signup());
     }
 
+    /**
+     * Tente de connecter l'utilisateur à partir du pseudo et du mot de passe
+     * saisis dans les champs de texte. Si la connexion réussit, l'utilisateur
+     * est redirigé vers son tableau de bord correspondant à son type de compte
+     * (Client ou Organisateur). En cas d'erreur, une alerte est affichée.
+     */
     private void login() {
         try {
             String pseudo = pseudoField.getText();
@@ -52,14 +71,14 @@ public class LoginController {
             Utilisateur user = userService.login(pseudo, mdp);
 
             if (user instanceof Client) {
-                // ✅ Client : on ouvre la page "événements" en mode client
+                // Client : on ouvre la page "événements" en mode client
                 // (création / stats cachées), il choisit un événement puis
                 // sera redirigé vers l'écran de réservation.
                 ouvrirDashboard(user);
             } else if (user instanceof Organisateur) {
                 System.out.println("Login Organisateur réussi !");
                
-            ouvrirDashboard(user);
+                ouvrirDashboard(user);
             }
 
         } catch (Exception ex) {
@@ -69,6 +88,12 @@ public class LoginController {
         }
     }
 
+/**
+ * Ouvre la fenêtre d'inscription en chargeant la vue dédiée.
+ * Cette méthode est appelée lorsque l'utilisateur clique sur
+ * le bouton "Créer un compte". En cas d'erreur de chargement,
+ * une alerte d'erreur est affichée.
+ */
     private void signup() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/signup-view.fxml"));
@@ -86,7 +111,11 @@ public class LoginController {
             alert.showAndWait();
         }
     }
-
+/**
+ * Ouvre le tableau de bord correspondant au type de compte de l'utilisateur.
+ * Charge la vue des événements, initialise son contrôleur avec l'utilisateur
+ * connecté, puis remplace la scène actuelle.
+ */
     private void ouvrirDashboard(Utilisateur utilisateur) throws IOException {
         FXMLLoader loader = new FXMLLoader(MainApplication.class.getResource("/views/evenements-view.fxml"));
         Parent root = loader.load();

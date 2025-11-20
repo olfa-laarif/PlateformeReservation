@@ -3,17 +3,37 @@ package org.example.dao;
 import org.example.model.Client;
 import org.example.model.Organisateur;
 import org.example.model.Utilisateur;
-
 import java.sql.*;
 
+
+/**
+ * DAO (Data Access Object) responsable des opérations CRUD liées aux utilisateurs.
+ * Cette classe permet la connexion, la création de comptes, ainsi que la vérification
+ * de l'existence d'un email ou d'un pseudo en base de données.
+ */
 public class UtilisateurDAO {
 
     private Connection connexion;
 
+    /**
+     * Construit un DAO utilisateur utilisant une connexion JDBC.
+     *
+     * @param connexion la connexion active à la base de données.
+     */
     public UtilisateurDAO(Connection connexion) {
         this.connexion = connexion;
     }
 
+    /**
+     * Tente de connecter un utilisateur en recherchant en base de données
+     * un enregistrement correspondant au pseudo et au mot de passe donnés.
+     *
+     * @param username le nom d'utilisateur saisi.
+     * @param mdp      le mot de passe saisi.
+     * @return un objet {@link Client} ou {@link Organisateur} si les identifiants
+     *         correspondent à un utilisateur existant, sinon {@code null}.
+     * @throws SQLException en cas d'erreur SQL lors de l'exécution de la requête.
+     */
     // Connexion utilisateur
     public Utilisateur login(String username, String mdp) throws SQLException {
         String sql = "SELECT * FROM `user` WHERE user_name = ? AND password = ?";
@@ -51,7 +71,14 @@ public class UtilisateurDAO {
         return null; // utilisateur non trouvé
     }
 
-    // Création utilisateur
+    /**
+     * Ajoute un nouvel utilisateur dans la base de données.
+     * Avant l'insertion, cette méthode vérifie que le pseudo et l'email
+     * ne sont pas déjà utilisés.
+     *
+     * @param user l'utilisateur à ajouter (Client ou Organisateur).
+     * @throws Exception si le pseudo ou l'email existe déjà, ou en cas d'erreur SQL.
+     */
     public void addUser(Utilisateur user) throws Exception {
         if (existePseudo(user.getPseudo())) {
             throw new Exception("Ce pseudo est déjà utilisé.");
@@ -76,7 +103,13 @@ public class UtilisateurDAO {
         }
     }
 
-    // Vérifier email existant
+    /**
+     * Vérifie si un email existe déjà dans la table des utilisateurs.
+     *
+     * @param email l'adresse email à vérifier.
+     * @return {@code true} si l'email est déjà utilisé, {@code false} sinon.
+     * @throws SQLException si une erreur survient lors de l'exécution de la requête.
+     */
     public boolean existeEmail(String email) throws SQLException {
         String sql = "SELECT 1 FROM user WHERE email = ?";
         try (PreparedStatement stmt = connexion.prepareStatement(sql)) {
@@ -87,7 +120,13 @@ public class UtilisateurDAO {
         }
     }
 
-    // Vérifier pseudo existant
+    /**
+     * Vérifie si un pseudo existe déjà dans la table des utilisateurs.
+     *
+     * @param pseudo le pseudo à vérifier.
+     * @return {@code true} si le pseudo existe déjà, {@code false} sinon.
+     * @throws SQLException si une erreur survient lors de l'exécution de la requête SQL.
+     */
     public boolean existePseudo(String pseudo) throws SQLException {
         String sql = "SELECT 1 FROM user WHERE user_name = ?";
         try (PreparedStatement stmt = connexion.prepareStatement(sql)) {
