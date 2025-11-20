@@ -23,7 +23,7 @@ import java.util.List;
  * Il permet à un client connecté de choisir un événement, une catégorie
  * de places puis de lancer le flux de réservation et de paiement.
  */
-public class ReservationController {
+public class ReservationController implements Reservable {
 
     @FXML private ComboBox<Evenement> eventsCombo;
     @FXML private ComboBox<Categorie> categoriesCombo;
@@ -124,7 +124,7 @@ public class ReservationController {
     /**
      * Lance la réservation : validations, appel du service puis ouverture du paiement.
      */
-    private void onReserve() {
+    public void onReserve() {
         if (client == null) { statusLabel.setText("Client non identifié. Connectez-vous."); return; }
         Evenement ev = eventsCombo.getValue();
         Categorie cat = categoriesCombo.getValue();
