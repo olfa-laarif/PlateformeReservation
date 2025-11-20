@@ -32,7 +32,6 @@ public class ReservationController {
     @FXML private ComboBox<Categorie> categoriesCombo;
     @FXML private Spinner<Integer> qtySpinner;
     @FXML private Button reserveButton;
-    @FXML private Button historyButton;
     @FXML private Button backButton;
     @FXML private Label statusLabel;
 
@@ -76,7 +75,6 @@ public class ReservationController {
 
         eventsCombo.setOnAction(e -> onEventSelected());
         reserveButton.setOnAction(e -> onReserve());
-        historyButton.setOnAction(e -> openHistoryWindow());
     }
 
     /**
@@ -154,30 +152,6 @@ public class ReservationController {
         } catch (Exception ex) {
             statusLabel.setText("Erreur lors de la réservation: " + ex.getMessage());
             new Alert(Alert.AlertType.ERROR, "Erreur: " + ex.getMessage(), ButtonType.OK).showAndWait();
-        }
-    }
-
-    /**
-     * Remplace la scène par la vue d'historique des réservations du client.
-     */
-    private void openHistoryWindow() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/history-view.fxml"));
-            javafx.scene.Parent historyRoot = loader.load();
-            Object ctrl = loader.getController();
-            if (ctrl instanceof HistoryController) {
-                ((HistoryController) ctrl).setClient(client);
-                // passer la racine actuelle pour permettre un retour
-                ((HistoryController) ctrl).setPreviousRoot(eventsCombo.getScene().getRoot());
-            }
-
-            // remplacer la racine de la scene (même fenêtre)
-            Stage stage = (Stage) eventsCombo.getScene().getWindow();
-            stage.getScene().setRoot(historyRoot);
-            stage.setTitle("Historique des réservations");
-
-        } catch (IOException e) {
-            new Alert(Alert.AlertType.ERROR, "Impossible d'ouvrir l'historique: " + e.getMessage(), ButtonType.OK).showAndWait();
         }
     }
 

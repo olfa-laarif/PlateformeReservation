@@ -31,7 +31,6 @@
 
         <HBox spacing="10">
             <Button fx:id="reserveButton" text="Réserver" styleClass="primary" />
-            <Button fx:id="historyButton" text="Historique" styleClass="secondary" />
         </HBox>
 
         <Label fx:id="statusLabel" text="" styleClass="status" />
